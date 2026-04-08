@@ -39,6 +39,8 @@ suppressPackageStartupMessages({
   library(stringr)
   library(readr)
   library(ggplot2)
+  library(sf)
+  library(rnaturalearth)
 })
 
 source(here::here("R", "utils.R"))
@@ -56,7 +58,8 @@ analysis_scripts <- c(
   "scripts/03_standardize_species.R",
   "scripts/04_standardize_lifestage.R",
   "scripts/05_standardize_location.R",
-  "scripts/06_summarize_plot.R"
+  "scripts/06_summarize_plot.R",
+  "scripts/07_review_process_figure.R"
 )
 
 for (script in analysis_scripts) {

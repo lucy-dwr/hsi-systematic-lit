@@ -174,3 +174,179 @@ save_location_map <- function(data, title, path) {
 
   ggplot2::ggsave(project_path(path), plot = plot, width = 11, height = 7, dpi = 300)
 }
+
+save_review_process_flow <- function(
+  path,
+  records_screened,
+  full_text_review,
+  included_in_analysis,
+  search_details,
+  title_abstract_note,
+  full_text_note,
+  title = "Systematic Literature Review Process"
+) {
+  title_abstract_excluded <- records_screened - full_text_review
+  full_text_excluded <- full_text_review - included_in_analysis
+
+  if (title_abstract_excluded < 0 || full_text_excluded < 0) {
+    stop("Review-process counts must decrease across screening stages.", call. = FALSE)
+  }
+
+  format_n <- function(x) {
+    format(x, big.mark = ",", trim = TRUE, scientific = FALSE)
+  }
+
+  box_data <- data.frame(
+    box_id = c("searches", "screened", "full_text", "included", "excluded_ta", "excluded_ft"),
+    box_group = c("search", "main", "main", "main", "excluded", "excluded"),
+    xmin = c(2.2, 2.2, 2.2, 2.2, 8.0, 8.0),
+    xmax = c(12.6, 6.8, 6.8, 6.8, 12.6, 12.6),
+    ymin = c(15.0, 10.6, 5.8, 1.0, 10.6, 5.8),
+    ymax = c(18.2, 13.6, 8.8, 4.0, 13.6, 8.8),
+    title = c(
+      "Database searches",
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      "Excluded after title and abstract screening",
+      "Excluded after full-text review"
+    ),
+    body = c(
+      search_details,
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      paste0(
+        "n = ", format_n(title_abstract_excluded), "\n\n",
+        title_abstract_note
+      ),
+      paste0(
+        "n = ", format_n(full_text_excluded), "\n\n",
+        full_text_note
+      )
+    ),
+    label = c(
+      NA_character_,
+      paste0(
+        "Records identified through database searching\n",
+        "n = ", format_n(records_screened)
+      ),
+      paste0(
+        "Reports assessed for eligibility by full-text review\n",
+        "n = ", format_n(full_text_review)
+      ),
+      paste0(
+        "Studies included in review and analysis\n",
+        "n = ", format_n(included_in_analysis)
+      ),
+      NA_character_,
+      NA_character_
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  box_data$fill <- dplyr::case_when(
+    box_data$box_group == "search" ~ "#F4F4F4",
+    TRUE ~ "white"
+  )
+
+  text_data <- box_data |>
+    dplyr::mutate(
+      x = (xmin + xmax) / 2,
+      y = (ymin + ymax) / 2,
+      text_size = dplyr::case_when(
+        box_group == "search" ~ 3.1,
+        box_group == "main" ~ 4.0,
+        TRUE ~ 3.0
+      ),
+      text_face = dplyr::case_when(
+        box_group == "main" ~ "bold",
+        TRUE ~ "plain"
+      )
+    )
+
+  title_text_data <- text_data |>
+    dplyr::filter(box_group %in% c("search", "excluded")) |>
+    dplyr::mutate(
+      title_y = dplyr::case_when(
+        box_group == "search" ~ ymax - 0.65,
+        TRUE ~ ymax - 0.35
+      ),
+      body_y = dplyr::case_when(
+        box_group == "search" ~ y - 0.05,
+        TRUE ~ y - 0.25
+      )
+    )
+
+  arrow_data <- data.frame(
+    x = c(4.5, 4.5, 4.5, 6.8, 6.8),
+    y = c(15.0, 10.6, 5.8, 12.1, 7.3),
+    xend = c(4.5, 4.5, 4.5, 8.0, 8.0),
+    yend = c(13.6, 8.8, 4.0, 12.1, 7.3)
+  )
+
+  stage_data <- data.frame(
+    x = c(0.55, 0.55, 0.55, 0.55),
+    y = c(16.6, 12.1, 7.3, 2.5),
+    label = c("Identification", "Screening", "Eligibility", "Included"),
+    stringsAsFactors = FALSE
+  )
+
+  plot <- ggplot2::ggplot() +
+    ggplot2::geom_rect(
+      data = box_data,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = box_data$fill,
+      color = "black",
+      linewidth = 0.5
+    ) +
+    ggplot2::geom_segment(
+      data = arrow_data,
+      ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+      linewidth = 0.45,
+      color = "black",
+      arrow = grid::arrow(length = grid::unit(0.18, "inches"), type = "closed")
+    ) +
+    ggplot2::geom_text(
+      data = stage_data,
+      ggplot2::aes(x = x, y = y, label = label),
+      hjust = 0,
+      size = 4.0,
+      fontface = "bold",
+      color = "#555555"
+    ) +
+    ggplot2::geom_text(
+      data = text_data |>
+        dplyr::filter(box_group == "main"),
+      ggplot2::aes(x = x, y = y, label = label),
+      size = 4.0,
+      fontface = "bold",
+      lineheight = 1.1
+    ) +
+    ggplot2::geom_text(
+      data = title_text_data,
+      ggplot2::aes(x = x, y = title_y, label = title),
+      size = 3.1,
+      fontface = "bold",
+      vjust = 1,
+      lineheight = 1.05
+    ) +
+    ggplot2::geom_text(
+      data = title_text_data,
+      ggplot2::aes(x = x, y = body_y, label = body),
+      size = 3.1,
+      vjust = 0.5,
+      lineheight = 1.08
+    ) +
+    ggplot2::coord_cartesian(xlim = c(0.2, 13.4), ylim = c(0.6, 18.4), clip = "off") +
+    ggplot2::labs(title = title) +
+    ggplot2::theme_void(base_size = 14) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(face = "bold", size = 18, hjust = 0, margin = ggplot2::margin(b = 12)),
+      plot.margin = ggplot2::margin(16, 20, 16, 16),
+      plot.background = ggplot2::element_rect(fill = "white", color = NA),
+      panel.background = ggplot2::element_rect(fill = "white", color = NA)
+    )
+
+  ggplot2::ggsave(project_path(path), plot = plot, width = 14.5, height = 9, dpi = 300)
+}
