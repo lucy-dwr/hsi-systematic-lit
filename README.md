@@ -1,4 +1,4 @@
-# hsi-systematic-lit
+# Systematic literature review: salmon, cover, and habitat suitability
 
 This repository contains code for a systematic literature analysis supporting a
 paper on the role and influence of cover on salmonid behavior, with attention
