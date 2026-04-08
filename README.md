@@ -1,1 +1,63 @@
 # hsi-systematic-lit
+
+This repository contains code for a systematic literature analysis supporting a
+paper on the role and influence of cover on salmonid behavior, with attention
+paid to how cover is represented in habitat suitability indices (HSIs).
+
+The workflow combines two independent full-text review datasets, reconciles and
+cleans the review fields, standardizes key study attributes, and produces
+derived tables and summary figures for the scientific manuscript.
+
+## What the analysis does
+
+The pipeline:
+
+- imports and merges reviewer datasets from `data-raw/`
+- preserves a reviewer comparison table for traceability
+- filters to the included studies
+- standardizes species, lifestage, and location fields
+- writes cleaned outputs to `data-derived/`
+- saves summary plots to `figures/`
+
+## Repository structure
+
+- `run_analysis.R`: main entrypoint that runs the full pipeline
+- `scripts/`: ordered analysis steps
+- `R/`: reusable helper functions for import, cleaning, standardization, and plotting
+- `data-raw/`: source review spreadsheets
+- `data-derived/`: cleaned datasets, crosswalks, and summaries
+- `figures/`: generated plots
+
+## Running the analysis
+
+This project uses `renv` for package management. From the project root:
+
+```r
+renv::restore()
+source("run_analysis.R")
+```
+
+Or from the shell:
+
+```sh
+Rscript run_analysis.R
+```
+
+## Main outputs
+
+Representative outputs include:
+
+- `data-derived/reviewer_comparison.csv`
+- `data-derived/papers_clean.csv`
+- `data-derived/paper_species.csv`
+- `data-derived/paper_lifestage.csv`
+- `data-derived/paper_locations.csv`
+- `data-derived/summary_*.csv`
+- `figures/year_published.png`
+- `figures/species.png`
+- `figures/lifestage.png`
+- `figures/location.png`
+
+<p align="center">
+  <img src="assets/readme/salmon-cover.png" alt="Salmon sheltering near underwater cover" />
+</p>
