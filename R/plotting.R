@@ -63,6 +63,10 @@ build_location_map_layers <- function() {
     stop("Package 'rnaturalearthdata' is required to draw the location map.", call. = FALSE)
   }
 
+  if (!suppressPackageStartupMessages(requireNamespace("rnaturalearthhires", quietly = TRUE))) {
+    stop("Package 'rnaturalearthhires' is required to draw subnational map units.", call. = FALSE)
+  }
+
   world_map <- suppressMessages(
     rnaturalearth::ne_countries(scale = "medium", type = "map_units", returnclass = "sf")
   )
