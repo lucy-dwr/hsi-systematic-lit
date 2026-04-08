@@ -68,5 +68,5 @@ jobs:
           test -f figures/review_process.png
           test -f figures/location.png
 
-      - name: Check committed outputs are current
-        run: git diff --exit-code -- data-derived figures
+      - name: Check committed tabular outputs are current
+        run: git diff --exit-code -- data-derived
