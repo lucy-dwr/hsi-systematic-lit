@@ -44,6 +44,19 @@ Or from the shell:
 Rscript run_analysis.R
 ```
 
+## Tests and CI
+
+Basic repository checks can be run locally with:
+
+```sh
+Rscript --vanilla tests/run_tests.R
+Rscript --vanilla scripts/check_renv_sync.R
+```
+
+The GitHub Actions workflow runs those checks, then executes the full analysis
+and verifies that committed outputs under `data-derived/` and `figures/` are
+still current.
+
 ## Review workflow
 
 The review-process figure summarizes a database search for salmonid habitat

@@ -34,7 +34,7 @@ normalize_string <- function(x) {
   }
 
   x <- normalize_utf8(x)
-  x <- stringr::str_replace_all(x, fixed("\u00A0"), " ")
+  x <- stringr::str_replace_all(x, stringr::fixed("\u00A0"), " ")
   x <- stringr::str_squish(x)
   x[x == ""] <- NA_character_
   x
