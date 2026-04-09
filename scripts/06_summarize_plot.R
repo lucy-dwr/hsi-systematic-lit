@@ -1,3 +1,14 @@
+lifestage_display_order <- c(
+  "adult",
+  "unspecified juvenile",
+  "smolt",
+  "yearling",
+  "subyearling",
+  "parr",
+  "fry",
+  "egg"
+)
+
 year_summary <- papers_included |>
   dplyr::count(publication_year, name = "n_papers") |>
   dplyr::filter(!is.na(publication_year)) |>
@@ -18,9 +29,11 @@ lifestage_summary <- paper_lifestage |>
       lifestage == "juvenile_unspecified",
       "unspecified juvenile",
       lifestage
-    )
+    ),
+    lifestage_order = match(lifestage, lifestage_display_order)
   ) |>
-  dplyr::arrange(dplyr::desc(n_papers), lifestage)
+  dplyr::arrange(lifestage_order) |>
+  dplyr::select(-lifestage_order)
 
 location_summary <- paper_locations |>
   dplyr::count(location_standardized, location_type, name = "n_papers") |>
