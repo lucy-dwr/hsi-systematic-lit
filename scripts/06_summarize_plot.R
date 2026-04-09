@@ -1,5 +1,10 @@
 year_summary <- papers_included |>
   dplyr::count(publication_year, name = "n_papers") |>
+  dplyr::filter(!is.na(publication_year)) |>
+  tidyr::complete(
+    publication_year = seq(min(publication_year), max(publication_year), by = 1),
+    fill = list(n_papers = 0L)
+  ) |>
   dplyr::arrange(publication_year)
 
 species_summary <- paper_species |>
@@ -46,14 +51,13 @@ write_derived_csv(location_summary, "data-derived/summary_location.csv")
 write_derived_csv(location_map_summary, "data-derived/summary_location_map.csv")
 write_derived_csv(location_type_summary, "data-derived/summary_location_type.csv")
 
-save_count_plot(
+save_year_time_series_plot(
   data = year_summary,
-  category_col = "publication_year",
+  year_col = "publication_year",
   count_col = "n_papers",
   title = "Papers by Publication Year",
   path = "figures/year_published.png",
-  fill = "#000000",
-  flip = FALSE
+  fill = "#000000"
 )
 
 save_count_plot(

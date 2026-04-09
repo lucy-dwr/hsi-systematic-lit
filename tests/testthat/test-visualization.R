@@ -26,3 +26,21 @@ test_that("review-process plotting writes files and rejects invalid stage counts
     "counts must decrease"
   )
 })
+
+test_that("year time-series plotting writes files with a continuous year axis input", {
+  plot_path <- tempfile(fileext = ".png")
+
+  save_year_time_series_plot(
+    data = data.frame(
+      publication_year = 2000:2003,
+      n_papers = c(1L, 0L, 2L, 0L)
+    ),
+    year_col = "publication_year",
+    count_col = "n_papers",
+    title = "Papers by Publication Year",
+    path = plot_path,
+    fill = "#000000"
+  )
+
+  expect_true(file.exists(plot_path))
+})

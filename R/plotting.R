@@ -50,6 +50,62 @@ save_count_plot <- function(data, category_col, count_col, title, path, fill, fl
   ggplot2::ggsave(project_path(path), plot = plot, width = 9, height = 6, dpi = 300)
 }
 
+save_year_time_series_plot <- function(data, year_col, count_col, title, path, fill) {
+  plot_data <- data |>
+    dplyr::arrange(.data[[year_col]])
+
+  max_count <- max(plot_data[[count_col]], na.rm = TRUE)
+  label_padding <- max_count * 0.03 + 0.2
+  axis_limit <- max_count + label_padding + 0.2
+  break_by <- if (max_count <= 6) 1 else 2
+  count_breaks <- seq(0, ceiling(axis_limit), by = break_by)
+  year_range <- range(plot_data[[year_col]], na.rm = TRUE)
+  year_breaks <- seq(year_range[1], year_range[2], by = 1)
+  year_limits <- c(year_range[1] - 0.5, year_range[2] + 0.5)
+
+  plot <- ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = .data[[year_col]], y = .data[[count_col]])
+  ) +
+    ggplot2::geom_col(fill = fill, width = 0.8) +
+    ggplot2::geom_text(
+      data = plot_data |>
+        dplyr::filter(.data[[count_col]] > 0),
+      ggplot2::aes(
+        y = .data[[count_col]] + label_padding,
+        label = .data[[count_col]]
+      ),
+      vjust = 0,
+      size = 4
+    ) +
+    ggplot2::labs(
+      title = title,
+      x = "Publication year",
+      y = "Papers"
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = year_breaks,
+      limits = year_limits,
+      expand = ggplot2::expansion(mult = c(0, 0))
+    ) +
+    ggplot2::scale_y_continuous(
+      breaks = count_breaks,
+      limits = c(0, axis_limit),
+      expand = ggplot2::expansion(mult = c(0, 0))
+    ) +
+    ggplot2::theme_minimal(base_size = 14) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(face = "bold", size = 16),
+      axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 16), size = 14),
+      axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 10), size = 14),
+      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1, size = 10.5),
+      axis.text.y = ggplot2::element_text(size = 12),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+
+  ggplot2::ggsave(project_path(path), plot = plot, width = 11, height = 6, dpi = 300)
+}
+
 build_location_map_layers <- function() {
   if (!suppressPackageStartupMessages(requireNamespace("sf", quietly = TRUE))) {
     stop("Package 'sf' is required to draw the location map.", call. = FALSE)
