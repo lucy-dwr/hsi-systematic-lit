@@ -138,7 +138,7 @@ field_match <- function(a, b) {
 }
 
 parse_publication_year <- function(x) {
-  year <- stringr::str_extract(x, "(?<!\\d)\\d{4}(?!\\d)$")
+  year <- stringr::str_extract(x, "(?<!\\d)\\d{4}(?!\\d)")
   as.integer(year)
 }
 

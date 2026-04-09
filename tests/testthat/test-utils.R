@@ -6,7 +6,7 @@ test_that("utility helpers normalize flags, years, reviewer values, and map alia
 
   expect_identical(
     parse_publication_year(c("smith_1999", "jones-2005", "paper_2001_rev2", "no_year")),
-    c(1999L, 2005L, NA_integer_, NA_integer_)
+    c(1999L, 2005L, 2001L, NA_integer_)
   )
 
   expect_identical(
