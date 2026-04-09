@@ -13,6 +13,13 @@ species_summary <- paper_species |>
 
 lifestage_summary <- paper_lifestage |>
   dplyr::count(lifestage, name = "n_papers") |>
+  dplyr::mutate(
+    lifestage = dplyr::if_else(
+      lifestage == "juvenile_unspecified",
+      "unspecified juvenile",
+      lifestage
+    )
+  ) |>
   dplyr::arrange(dplyr::desc(n_papers), lifestage)
 
 location_summary <- paper_locations |>
